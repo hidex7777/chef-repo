@@ -1,4 +1,12 @@
 {
+	"bashrc":{
+		"histsize": 90000,
+		"histfilesize": 90000
+	},
+	"sshd_config":{
+		"passauth": "PasswordAuthentication no",
+		"usepam": "UsePam no"
+	},
 	"run_list":[
 		"recipe[defset]"
 	]
