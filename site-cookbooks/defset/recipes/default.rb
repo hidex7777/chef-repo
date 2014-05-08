@@ -78,3 +78,37 @@ execute "ufw-enable" do
 	notifies :run, "execute[ufw-limit-openssh]", :immediately
 end
 
+execute "ufw-allow-apache" do
+	command 'ufw allow "Apache Full"'
+	action :nothing
+end
+
+package "apache2" do
+	action :install
+	notifies :run, "execute[ufw-allow-apache]", :immediately
+end
+
+service "apache2" do
+  supports :status => true, :start => true, :stop => true, :restart => true, :reload => true
+  action :nothing
+end
+
+execute "a2dissite-default" do
+  command 'a2dissite 000-default'
+  action :nothing
+  notifies :reload, "service[apache2]", :immediately
+end
+
+execute "a2ensite-www" do
+  command 'a2ensite www'
+  action :nothing
+  notifies :run, "execute[a2dissite-default]", :immediately
+end
+
+template "www.conf" do
+  path "/etc/apache2/sites-available/www.conf"
+  source "www.conf.erb"
+  mode 0644
+  notifies :run, "execute[a2ensite-www]", :immediately
+end
+

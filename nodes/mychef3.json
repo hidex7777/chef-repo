@@ -7,6 +7,10 @@
 		"passauth": "PasswordAuthentication no",
 		"usepam": "UsePam no"
 	},
+	"wwwconf":{
+		"documentroot": "/vagrant",
+		"directory": "/vagrant"
+	},
 	"run_list":[
 		"recipe[defset]"
 	]
