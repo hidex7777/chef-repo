@@ -4,6 +4,7 @@
 		"histfilesize": 90000
 	},
 	"sshd_config":{
+		"port": 22,
 		"passauth": "PasswordAuthentication no",
 		"usepam": "UsePam no"
 	},

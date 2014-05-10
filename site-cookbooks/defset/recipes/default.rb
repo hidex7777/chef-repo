@@ -56,10 +56,33 @@ package "ntp" do
 	action :install
 end
 
+service "ntp-stop" do
+	service_name "ntp"
+	action :stop
+	notifies :run, "execute[ntpdate]", :immediately
+end
+
+service "ntp" do
+	supports :status => true, :start => true, :stop => true, :restart => true, :reload => true
+	action :nothing
+end
+
+execute "ntpdate" do
+	command "ntpdate ntp.nict.jp"
+	action :nothing
+	notifies :start, "service[ntp]", :immediately
+end
+
+service "ssh" do
+  supports :status => true, :start => true, :stop => true, :restart => true, :reload => true
+  action :nothing
+end
+
 template "sshd_config" do
-	path "/etc/ssh/sshd_config"
-	source "sshd_config.erb"
-	mode 0644
+  path "/etc/ssh/sshd_config"
+  source "sshd_config.erb"
+  mode 0644
+  notifies :restart, "service[ssh]", :immediately
 end
 
 execute "ufw-allow-openssh" do
@@ -89,26 +112,44 @@ package "apache2" do
 end
 
 service "apache2" do
-  supports :status => true, :start => true, :stop => true, :restart => true, :reload => true
-  action :nothing
+	supports :status => true, :start => true, :stop => true, :restart => true, :reload => true
+	action :nothing
 end
 
 execute "a2dissite-default" do
-  command 'a2dissite 000-default'
+	command 'a2dissite 000-default'
+	action :nothing
+	notifies :reload, "service[apache2]", :immediately
+end
+
+execute "a2ensite-www" do
+	command 'a2ensite www'
+	action :nothing
+	notifies :run, "execute[a2dissite-default]", :immediately
+end
+
+template "www.conf" do
+	path "/etc/apache2/sites-available/www.conf"
+	source "www.conf.erb"
+	mode 0644
+	notifies :run, "execute[a2ensite-www]", :immediately
+end
+
+execute "a2ensite-ssl" do
+  command 'a2ensite www-ssl'
   action :nothing
   notifies :reload, "service[apache2]", :immediately
 end
 
-execute "a2ensite-www" do
-  command 'a2ensite www'
+execute "a2enmod-ssl" do
+  command 'a2enmod ssl'
   action :nothing
-  notifies :run, "execute[a2dissite-default]", :immediately
+  notifies :run, "execute[a2ensite-ssl]", :immediately
 end
 
-template "www.conf" do
-  path "/etc/apache2/sites-available/www.conf"
-  source "www.conf.erb"
+template "www-ssl.conf" do
+  path "/etc/apache2/sites-available/www-ssl.conf"
+  source "www-ssl.conf.erb"
   mode 0644
-  notifies :run, "execute[a2ensite-www]", :immediately
+  notifies :run, "execute[a2ensite-ssl]", :immediately
 end
-
