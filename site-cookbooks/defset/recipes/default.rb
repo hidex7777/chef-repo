@@ -52,16 +52,6 @@ package "git" do
 	action :install
 end
 
-package "ntp" do
-	action :install
-end
-
-service "ntp-stop" do
-	service_name "ntp"
-	action :stop
-	notifies :run, "execute[ntpdate]", :immediately
-end
-
 service "ntp" do
 	supports :status => true, :start => true, :stop => true, :restart => true, :reload => true
 	action :nothing
@@ -73,16 +63,22 @@ execute "ntpdate" do
 	notifies :start, "service[ntp]", :immediately
 end
 
+package "ntp" do
+	action :install
+	notifies :stop, "service[ntp]", :immediately
+	notifies :run, "execute[ntpdate]", :immediately
+end
+
 service "ssh" do
-  supports :status => true, :start => true, :stop => true, :restart => true, :reload => true
-  action :nothing
+	supports :status => true, :start => true, :stop => true, :restart => true, :reload => true
+	action :nothing
 end
 
 template "sshd_config" do
-  path "/etc/ssh/sshd_config"
-  source "sshd_config.erb"
-  mode 0644
-  notifies :restart, "service[ssh]", :immediately
+	path "/etc/ssh/sshd_config"
+	source "sshd_config.erb"
+	mode 0644
+	notifies :restart, "service[ssh]", :immediately
 end
 
 execute "ufw-allow-openssh" do
@@ -153,3 +149,4 @@ template "www-ssl.conf" do
   mode 0644
   notifies :run, "execute[a2ensite-ssl]", :immediately
 end
+
