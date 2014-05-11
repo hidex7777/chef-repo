@@ -1,4 +1,4 @@
-cookbook_path    ["cookbooks", "site-cookbooks"]
+cookbook_path    ["cookbooks", "site-cookbooks", "berks-cookbooks"]
 node_path        "nodes"
 role_path        "roles"
 environment_path "environments"

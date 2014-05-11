@@ -12,7 +12,18 @@
 		"documentroot": "/vagrant",
 		"directory": "/vagrant"
 	},
+	"rbenv": {
+		"user_installs": [
+			{
+				"user": "vagrant",
+				"rubies": ["2.0.0-p353"],
+				"global": "2.0.0-p353"
+			}
+		]
+	},
 	"run_list":[
-		"recipe[defset]"
+		"recipe[defset]",
+		"ruby_build",
+		"rbenv::user"
 	]
 }
