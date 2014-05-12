@@ -9,12 +9,12 @@
 log "Hello World"
 
 execute "aptitude-dist-upgrade" do
-	command "sudo aptitude dist-upgrade -y"
+	command "aptitude dist-upgrade -y"
 	action :nothing
 end
 
 execute "aptitude-update" do
-	command "sudo aptitude update -y"
+	command "aptitude update -y"
 	notifies :run, "execute[aptitude-dist-upgrade]", :immediately
 end
 
